@@ -48,31 +48,42 @@ const questions: QuestionCollection = [
     }
 ];
 
-if (argv['init']) {
-    prompt(questions)
-        .then(async answers => {
-            const createTemplateResult = await createTemplate({ name: answers.projectName, template: getTemplate(answers.architecture) }, new RecursiveCopyAdapter())
-            if (answers.installDependencies) {
-                if (createTemplateResult === createTemplateError.PROJECT_ALREADY_EXIST) {
-                    console.log('Project name already exist :(');
-                    return;
-                }
-                if (createTemplateResult === createTemplateError.UNKNOWN_ERROR) {
-                    console.log('Could not create project :(');
-                    return;
-                }
+// if (argv['init']) {
+prompt(questions)
+    .then(async answers => {
+        const createTemplateResult = await createTemplate({ name: answers.projectName, template: getTemplate(answers.architecture) }, new RecursiveCopyAdapter());
 
-                var spinner = new Spinner('Creating project... %s');
-                spinner.setSpinnerString('|/-\\');
-                spinner.start();
-                execSync("npm install " + createTemplateResult);
-                spinner.stop();
-                console.log('Project created on successfully!!! 🚀');
+        if (createTemplateResult === createTemplateError.PROJECT_ALREADY_EXIST) {
+            console.log("\n");
+            console.log('Project name already exist :(');
+            return;
+        }
+        if (createTemplateResult === createTemplateError.UNKNOWN_ERROR) {
+            console.log("\n");
+            console.log('Could not create project :(');
+            return;
+        }
 
-            }
+        if (answers.startWithGit) {
+            execSync("git init " + createTemplateResult);
+        }
+
+        if (answers.installDependencies) {
+            var spinner = new Spinner('Creating project... %s');
+            spinner.setSpinnerString('|/-\\');
+            spinner.start();
+            execSync("npm install " + createTemplateResult);
+            spinner.stop();
+            spinner.clearLine(spinner.stream);
+            console.log("\n");
             console.log('Project created on successfully!!! 🚀');
-        });
-}
+            return;
+        }
+
+        console.log("\n");
+        console.log('Project created on successfully!!! 🚀');
+    });
+// }
 
 function getTemplate(architecture: string) {
     let template;

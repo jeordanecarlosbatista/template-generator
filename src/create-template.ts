@@ -41,6 +41,6 @@ function alreadyProjectCreated(dest: string) {
 function findPath(name: string | undefined, template: string) {
     const source = path.resolve('src', 'templates', template);
 
-    const dest = name !== undefined ? name : template;
+    const dest = name !== undefined && name !== '' && name !== null ? name : template;
     return { dest, source };
 }
